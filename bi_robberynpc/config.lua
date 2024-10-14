@@ -1,7 +1,7 @@
 Config = {}
 
 -- logs discord 
-Config.DiscordWebhook = 'https://discord.com/api/webhooks/1295466737013227630/PdGLpC1zMqZ0fJjIfBM6YerKkq2w0MQVugdvCkJ1M0IK9EYBKpL8HyH3y9PqYafKeLLa'
+Config.DiscordWebhook = 'VOTRE WEBHOOK DISCORD '
 
 Config.RichZones = {
     "Rockford Hills", "Vinewood", "Richman", "Del Perro"
