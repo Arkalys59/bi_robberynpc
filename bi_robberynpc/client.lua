@@ -36,10 +36,30 @@ function TryRobPed(ped)
     local playerCoords = GetEntityCoords(playerPed)
     local pedCoords = GetEntityCoords(ped)
 
-    if #(playerCoords - pedCoords) < 2.0 then
+    if #(playerCoords - pedCoords) < 5.0 then 
+        FreezeEntityPosition(ped, true)
+        TaskHandsUp(ped, 5000, playerPed, -1, true)
+        TaskTurnPedToFaceEntity(playerPed, ped, -1)
+
+        local moveToNPC = true
+        local moveSpeed = 1.5
+
+        while moveToNPC do
+            playerCoords = GetEntityCoords(playerPed)
+            if #(playerCoords - pedCoords) > 1.0 then
+                TaskGoStraightToCoord(playerPed, pedCoords.x, pedCoords.y, pedCoords.z, moveSpeed, 500, GetEntityHeading(ped), 0.1)
+                Wait(100)
+            else
+                moveToNPC = false
+            end
+        end
+
+        loadAnimDict('mp_common')
+
         TaskTurnPedToFaceEntity(ped, playerPed, 1000)
         TaskPlayAnim(playerPed, 'mp_common', 'givetake1_a', 8.0, -8.0, -1, 49, 0, false, false, false)
-        TaskHandsUp(ped, 2000, playerPed, -1, true)
+
+        Wait(3000)
 
         local zoneName = GetLabelText(GetNameOfZone(playerCoords.x, playerCoords.y, playerCoords.z))
         local moneyStolen = CalculateStolenAmount(zoneName)
@@ -47,28 +67,28 @@ function TryRobPed(ped)
         local success = math.random(1, 100)
 
         if success <= Config.ChanceToReceiveItem then
-            ClearPedTasksImmediately(playerPed) 
+            ClearPedTasksImmediately(playerPed)
             local randomItem = Config.RobberyItems[math.random(1, #Config.RobberyItems)]
             TriggerServerEvent('bibiModz:giveItem', randomItem)
             ShowNotification("Objet reçu", "Vous avez reçu " .. randomItem.quantity .. "x " .. randomItem.name, "success")
-            TaskReactAndFleePed(ped, playerPed)
 
         elseif success <= Config.ChanceToStealMoney + Config.ChanceToReceiveItem then
-            ClearPedTasksImmediately(playerPed) 
+            ClearPedTasksImmediately(playerPed)
             TriggerServerEvent('bibiModz:robSuccess', moneyStolen, zoneName, true)
-            ShowNotification("Vol", "Vous avez volé $" .. moneyStolen .. " dans la zone : " .. zoneName, "success")
-            TaskReactAndFleePed(ped, playerPed)
+            ShowNotification("Succès", "Vous avez volé $" .. moneyStolen .. " dans la zone : " .. zoneName, "success")
 
         else
-            ClearPedTasksImmediately(playerPed) 
+            ClearPedTasksImmediately(playerPed)
             TriggerServerEvent('bibiModz:robSuccess', 0, zoneName, false)
-            ShowNotification("Échec", "Le vol a échoué, le citoyen s'échappe!", "error")
-            TaskReactAndFleePed(ped, playerPed)
+            ShowNotification("Échec", "Le vol a échoué, le NPC s'échappe!", "error")
         end
+
+        FreezeEntityPosition(ped, false)
+        TaskReactAndFleePed(ped, playerPed)
 
         exports.ox_target:removeLocalEntity(ped)
     else
-        ShowNotification("Échec", "Vous êtes trop loin du citoyen!", "error")
+        ShowNotification("Erreur", "Vous êtes trop loin du NPC!", "error")
     end
 end
 
