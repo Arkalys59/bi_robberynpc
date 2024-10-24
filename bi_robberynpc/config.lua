@@ -1,7 +1,24 @@
 Config = {}
 
+-- modèles blacklistés
+Config.BlacklistedModels = {
+    "s_m_y_cop_01",
+    "s_f_y_cop_01",
+    "s_m_y_sheriff_01",
+    "s_m_y_hwaycop_01",
+    "s_m_m_security_01",
+    "mp_m_freemode_01",
+    "mp_f_freemode_01"
+}
+
+-- Nom du job police (configurable)
+Config.PoliceJobName = "police"
+
+-- appel police
+Config.PoliceAlertChance = 10 -- 10% de chance
+
 -- logs discord 
-Config.DiscordWebhook = 'VOTRE WEBHOOK DISCORD '
+Config.DiscordWebhook = 'TON WEBHOOK'
 
 Config.RichZones = {
     "Rockford Hills", "Vinewood", "Richman", "Del Perro"
