@@ -70,3 +70,16 @@ function SendDiscordLog(playerName, amount, zone, status, reputation)
 
     PerformHttpRequest(Config.DiscordWebhook, function(err, text, headers) end, 'POST', json.encode({username = "Logs Vol à l'arraché", embeds = message}), { ['Content-Type'] = 'application/json' })
 end
+
+
+RegisterNetEvent('bibiModz:alertPolice')
+AddEventHandler('bibiModz:alertPolice', function(coords, policeJob)
+    local xPlayers = ESX.GetExtendedPlayers()
+
+    for _, xPlayer in pairs(xPlayers) do
+        if xPlayer.job.name == policeJob then
+            TriggerClientEvent('esx:showNotification', xPlayer.source, "Un vol a été signalé. Allez à la position indiquée.")
+            TriggerClientEvent('esx_addons_gcphone:sendMessage', xPlayer.source, "police", "Un vol a été signalé à ces coordonnées : " .. coords.x .. ", " .. coords.y)
+        end
+    end
+end)
