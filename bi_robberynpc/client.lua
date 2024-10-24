@@ -10,7 +10,9 @@ CreateThread(function()
         local peds = GetGamePool('CPed')
 
         for _, ped in pairs(peds) do
-            if DoesEntityExist(ped) and not IsPedAPlayer(ped) and not IsPedDeadOrDying(ped) and #(playerCoords - GetEntityCoords(ped)) < radius then
+            local pedModel = GetEntityModel(ped)
+
+            if not isBlacklisted(pedModel) and DoesEntityExist(ped) and not IsPedAPlayer(ped) and not IsPedDeadOrDying(ped) and #(playerCoords - GetEntityCoords(ped)) < radius then
                 if not pedTargets[ped] then
                     exports.ox_target:addLocalEntity(ped, {
                         {
@@ -36,7 +38,7 @@ function TryRobPed(ped)
     local playerCoords = GetEntityCoords(playerPed)
     local pedCoords = GetEntityCoords(ped)
 
-    if #(playerCoords - pedCoords) < 5.0 then 
+    if #(playerCoords - pedCoords) < 5.0 then
         FreezeEntityPosition(ped, true)
         TaskHandsUp(ped, 5000, playerPed, -1, true)
         TaskTurnPedToFaceEntity(playerPed, ped, -1)
@@ -86,10 +88,31 @@ function TryRobPed(ped)
         FreezeEntityPosition(ped, false)
         TaskReactAndFleePed(ped, playerPed)
 
+        local alertPolice = math.random(1, 100) <= Config.PoliceAlertChance
+        if alertPolice then
+            AlertPolice(playerCoords)
+        end
+
         exports.ox_target:removeLocalEntity(ped)
     else
         ShowNotification("Erreur", "Vous êtes trop loin du NPC!", "error")
     end
+end
+
+
+function AlertPolice(coords)
+    TriggerServerEvent('bibiModz:alertPolice', coords, Config.PoliceJobName)
+    ShowNotification("Alerte", "La police a été alertée!", "error")
+end
+
+
+function isBlacklisted(pedModel)
+    for _, model in ipairs(Config.BlacklistedModels) do
+        if GetHashKey(model) == pedModel then
+            return true
+        end
+    end
+    return false
 end
 
 function CalculateStolenAmount(zone)
